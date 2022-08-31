@@ -43,14 +43,17 @@ app.use(require('express-session')({
 
 
 //! ฝั่งขอมูลผู้ใช้ในตอนเริ่มต้น
-// app.use((req, res, next) => {
-//   User.findById('62fcba1c4b0f764d201c6684')
-//     .then(user => {
-//       req.user = user;
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+  if(!req.session.user){
+    return next()
+  }
+  User.findById(req.session.user._id)
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
