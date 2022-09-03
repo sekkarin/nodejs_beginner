@@ -66,18 +66,18 @@ mongoose
     MONGODB_URI
   )
   .then(result => {
-    User.findOne().then(user => {
-      if (!user) {
-        const user = new User({
-          name: 'Ken',
-          email: 'admin@admin.com',
-          cart: {
-            items: []
-          }
-        });
-        user.save();
-      }
-    });
+    // User.findOne().then(user => {
+    //   if (!user) {
+    //     const user = new User({
+    //       name: 'Ken',
+    //       email: 'admin@admin.com',
+    //       cart: {
+    //         items: []
+    //       }
+    //     });
+    //     user.save();
+    //   }
+    // });
     app.listen(3000);
   })
   .catch(err => {
