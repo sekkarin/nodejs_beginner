@@ -6,12 +6,13 @@ const errorController = require('./controllers/error');
 const User = require('./models/user');
 //* https://github.com/expressjs/session
 const session = require('express-session')
+const csrf = require('csurf')
 const MongoDBStore = require('connect-mongodb-session')(session)
 
 const MONGODB_URI = 'mongodb://localhost:27017/shop'
 
 const app = express();
-
+const csrfProtection = csrf()
 var store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
@@ -40,7 +41,7 @@ app.use(require('express-session')({
   resave: true,
   saveUninitialized: true
 }));
-
+app.use(csrfProtection)
 
 //! ฝั่งขอมูลผู้ใช้ในตอนเริ่มต้น
 app.use((req, res, next) => {
@@ -54,6 +55,11 @@ app.use((req, res, next) => {
     })
     .catch(err => console.log(err));
 });
+app.use((req,res,next)=>{
+  res.locals.isAuthticated = req.session.isLoggendIn
+  res.locals.csrfToken = req.csrfToken()
+  next()
+})
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
