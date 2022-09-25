@@ -8,7 +8,7 @@ const User = require('./models/user');
 const session = require('express-session')
 const csrf = require('csurf')
 const MongoDBStore = require('connect-mongodb-session')(session)
-
+const flash = require('connect-flash')
 const MONGODB_URI = 'mongodb://localhost:27017/shop'
 
 const app = express();
@@ -17,7 +17,7 @@ var store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
 })
-store.on('error', function(error) {
+store.on('error', function (error) {
   console.log(error);
 });
 
@@ -42,10 +42,11 @@ app.use(require('express-session')({
   saveUninitialized: true
 }));
 app.use(csrfProtection)
+app.use(flash())
 
 //! ฝั่งขอมูลผู้ใช้ในตอนเริ่มต้น
 app.use((req, res, next) => {
-  if(!req.session.user){
+  if (!req.session.user) {
     return next()
   }
   User.findById(req.session.user._id)
@@ -55,7 +56,7 @@ app.use((req, res, next) => {
     })
     .catch(err => console.log(err));
 });
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
   res.locals.isAuthticated = req.session.isLoggendIn
   res.locals.csrfToken = req.csrfToken()
   next()
@@ -67,23 +68,11 @@ app.use(AuthRoutes);
 
 app.use(errorController.get404);
 
-mongoose
-  .connect(
-    MONGODB_URI
-  )
+mongoose.connect(
+  MONGODB_URI
+)
   .then(result => {
-    // User.findOne().then(user => {
-    //   if (!user) {
-    //     const user = new User({
-    //       name: 'Ken',
-    //       email: 'admin@admin.com',
-    //       cart: {
-    //         items: []
-    //       }
-    //     });
-    //     user.save();
-    //   }
-    // });
+  
     app.listen(3000);
   })
   .catch(err => {
